@@ -1,11 +1,11 @@
 import "./App.css";
-import { Dots } from "./components/dots";
+import { DotsComponent } from "./components/dots-component";
 import { ThemeProvider } from "./components/theme-provider";
 
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <Dots />
+      <DotsComponent />
     </ThemeProvider>
   );
 }
