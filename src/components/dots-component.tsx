@@ -1,4 +1,3 @@
-import { getDaysInMonth, getDaysInYear } from "date-fns";
 import { motion, AnimatePresence } from "motion/react";
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,44 +8,28 @@ import {
   SelectTrigger,
   SelectValue
 } from "./ui/select";
-
-type MeasureType =
-  | "seconds"
-  | "minutes"
-  | "hour"
-  | "day"
-  | "week"
-  | "month"
-  | "year";
-const measures: MeasureType[] = [
-  "seconds",
-  "minutes",
-  "hour",
-  "day",
-  "week",
-  "month"
-];
-const measures_against: MeasureType[] = [
-  "minutes",
-  "hour",
-  "day",
-  "week",
-  "month",
-  "year"
-];
+import {
+  cn,
+  generateDots,
+  getActiveDay,
+  measures,
+  MeasureType
+} from "@/lib/utils";
+import useSWR from "swr";
 
 const DotsComponent = () => {
   const [measure, setMeasure] = React.useState<MeasureType>("day");
   const [against, setAgainst] = React.useState<MeasureType>("year");
-  const dots = React.useMemo(() => generateDots(measure), [measure]);
+  const { data: dots } = useSWR([measure, against], generateDots);
+
   return (
     <main className="flex flex-col justify-between w-full space-y-5">
       <p className="text-2xl text-center">Life in Dots</p>
       <ScrollArea className="h-[80vh] w-full ">
         <div className="flex flex-row flex-wrap items-center gap-2 size-full">
           <AnimatePresence>
-            {dots.map((_, i) => (
-              <Dots key={i} measure={measure} />
+            {dots?.map((_, i) => (
+              <Dots key={i} measure={measure} against={against} index={i} />
             ))}
           </AnimatePresence>
         </div>
@@ -76,7 +59,7 @@ const DotsComponent = () => {
             <SelectValue placeholder="Measure" />
           </SelectTrigger>
           <SelectContent>
-            {measures_against.map((m) => (
+            {measures.map((m) => (
               <SelectItem value={m} key={m} className="capitalize">
                 {m}
               </SelectItem>
@@ -90,21 +73,19 @@ const DotsComponent = () => {
 
 export { DotsComponent };
 
-const Dots = ({ measure }: { measure: MeasureType }) => {
-  const active = React.useMemo(() => {
-    switch (measure) {
-      case "day":
-        return Math.random() > 0.5;
-      case "week":
-        return Math.random() > 0.5;
-      case "month":
-        return Math.random() > 0.5;
-      case "year":
-        return Math.random() > 0.5;
-      default:
-        return Math.random() > 0.5;
-    }
-  }, [measure]);
+const Dots = ({
+  measure,
+  against,
+  index
+}: {
+  measure: MeasureType;
+  against: MeasureType;
+  index: number;
+}) => {
+  const active = React.useMemo(
+    () => getActiveDay(measure, against)(index),
+    [measure, against, index]
+  );
 
   return (
     <motion.div
@@ -112,28 +93,10 @@ const Dots = ({ measure }: { measure: MeasureType }) => {
       animate={{ scale: 1 }}
       exit={{ scale: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white rounded-full size-2"
-    />
+      className={cn(" rounded-full size-2 text-[10px] text-black", {
+        "bg-white": active,
+        "bg-neutral-700": !active
+      })}
+    ></motion.div>
   );
-};
-
-const generateDots = (measure: MeasureType) => {
-  switch (measure) {
-    case "day":
-      return Array.from({ length: 24 }, (_, i) => i);
-    case "week":
-      return Array.from({ length: 7 }, (_, i) => i);
-    case "month": {
-      const days = getDaysInMonth(new Date());
-      return Array.from({ length: days }, (_, i) => i);
-    }
-    case "year": {
-      const days = getDaysInYear(new Date());
-      return Array.from({ length: days }, (_, i) => i);
-    }
-    default: {
-      const days = getDaysInYear(new Date());
-      return Array.from({ length: days }, (_, i) => i);
-    }
-  }
 };
