@@ -72,21 +72,33 @@ export const getPercentageLeft = (
 ) => {
   switch (`${measure}-${against}` as CompareType) {
     case "day-week":
-      return (getDaysInWeek() - getDayInWeek(new Date())) / getDaysInWeek();
+      return Math.floor(
+        ((getDaysInWeek() - getDayInWeek(new Date())) / getDaysInWeek()) * 100
+      );
     case "day-month":
-      return (getDaysInMonth() - getDayInMonth(new Date())) / getDaysInMonth();
+      return Math.floor(
+        ((getDaysInMonth() - getDayInMonth(new Date())) / getDaysInMonth()) *
+          100
+      );
     case "day-year":
-      return (getDaysInYear() - getDayInYear(new Date())) / getDaysInYear();
+      return Math.floor(
+        ((getDaysInYear() - getDayInYear(new Date())) / getDaysInYear()) * 100
+      );
     case "week-month":
-      return (
-        (getWeeksInMonth() - getDayInMonth(new Date()) / 7) / getWeeksInMonth()
+      return Math.floor(
+        ((getWeeksInMonth() - getDayInMonth(new Date()) / 7) /
+          getWeeksInMonth()) *
+          100
       );
     case "week-year":
-      return (
-        (getWeeksInYear() - getDayInYear(new Date()) / 7) / getWeeksInYear()
+      return Math.floor(
+        ((getWeeksInYear() - getDayInYear(new Date()) / 7) / getWeeksInYear()) *
+          100
       );
     case "month-year":
-      return (getMonthsInYear() - new Date().getMonth()) / getMonthsInYear();
+      return Math.floor(
+        ((getMonthsInYear() - new Date().getMonth()) / getMonthsInYear()) * 100
+      );
     default:
       return 0;
   }

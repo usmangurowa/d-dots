@@ -12,6 +12,7 @@ import {
   cn,
   generateDots,
   getActiveDay,
+  getPercentageLeft,
   measures,
   MeasureType
 } from "@/lib/utils";
@@ -21,6 +22,11 @@ const DotsComponent = () => {
   const [measure, setMeasure] = React.useState<MeasureType>("day");
   const [against, setAgainst] = React.useState<MeasureType>("year");
   const { data: dots } = useSWR([measure, against], generateDots);
+
+  const percentageLeft = React.useMemo(
+    () => getPercentageLeft(measure, against),
+    [measure, against]
+  );
 
   return (
     <main className="flex flex-col justify-between w-full space-y-5">
@@ -34,38 +40,41 @@ const DotsComponent = () => {
           </AnimatePresence>
         </div>
       </ScrollArea>
-      <div className="flex items-center">
-        <Select
-          value={measure}
-          onValueChange={(val: MeasureType) => setMeasure(val)}
-        >
-          <SelectTrigger className="w-[100px] capitalize">
-            <SelectValue placeholder="Measure" />
-          </SelectTrigger>
-          <SelectContent>
-            {measures.map((m) => (
-              <SelectItem value={m} key={m} className="capitalize">
-                {m}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p className="px-2">In a</p>
-        <Select
-          value={against}
-          onValueChange={(val: MeasureType) => setAgainst(val)}
-        >
-          <SelectTrigger className="w-[100px] capitalize">
-            <SelectValue placeholder="Measure" />
-          </SelectTrigger>
-          <SelectContent>
-            {measures.map((m) => (
-              <SelectItem value={m} key={m} className="capitalize">
-                {m}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Select
+            value={measure}
+            onValueChange={(val: MeasureType) => setMeasure(val)}
+          >
+            <SelectTrigger className="w-[100px] capitalize">
+              <SelectValue placeholder="Measure" />
+            </SelectTrigger>
+            <SelectContent>
+              {measures.map((m) => (
+                <SelectItem value={m} key={m} className="capitalize">
+                  {m}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p>In a</p>
+          <Select
+            value={against}
+            onValueChange={(val: MeasureType) => setAgainst(val)}
+          >
+            <SelectTrigger className="w-[100px] capitalize">
+              <SelectValue placeholder="Measure" />
+            </SelectTrigger>
+            <SelectContent>
+              {measures.map((m) => (
+                <SelectItem value={m} key={m} className="capitalize">
+                  {m}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <p>{percentageLeft}% Left</p>
       </div>
     </main>
   );
